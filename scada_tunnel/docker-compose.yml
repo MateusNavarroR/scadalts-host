@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: scada_lab_tunnel
+    restart: unless-stopped
+    # O comando abaixo cria um túnel temporário.
+    # Se um dia quiser fixo, troque por: tunnel run --token SEU_TOKEN
+    command: tunnel --url http://host.docker.internal:8080
+
+    # IMPORTANTE: Isso permite que o container acesse o Windows/Linux hospedeiro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
