@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  database:
+    image: mysql:5.7
+    container_name: scada_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: scadalts
+      MYSQL_USER: scadalts
+      MYSQL_PASSWORD: scadalts
+    volumes:
+      - db_data:/var/lib/mysql
+    command: --character-set-server=utf8 --collation-server=utf8_bin --explicit_defaults_for_timestamp=1
+    restart: always
+    networks:
+      - scada_net
+
+  scadalts:
+    # BUILD: Usa o Dockerfile local para "injetar" as imagens na pasta correta
+    build: .
+    container_name: scada_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database
+    environment:
+      - DO_UPDATE=true
+    # VOLUMES: Removi o mapeamento de uploads.
+    # Agora seus gráficos são gerenciados exclusivamente pelo Dockerfile.
+    restart: always
+    networks:
+      - scada_net
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: scada_tunnel
+    restart: always
+    networks:
+      - scada_net
+    command: tunnel --protocol http2 --url http://scadalts:8080
+    depends_on:
+      - scadalts
+
+volumes:
+  db_data:
+
+networks:
+  scada_net:
