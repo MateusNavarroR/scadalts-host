@@ -135,27 +135,33 @@ set /p "RESTORE_FILE=Digite o NOME COMPLETO do arquivo (ex: backup_scada_2026...
 
 set "FULL_PATH=%BACKUP_DIR%\%RESTORE_FILE%"
 
-if exist "%FULL_PATH%" (
-    echo Isso ira sobrescrever o banco atual com o arquivo %RESTORE_FILE%.
-    set /p "CONFIRM=Tem certeza absoluta? (s/n): "
-
-    if /i "%CONFIRM%"=="s" (
-        echo Parando aplicacao Scada para evitar conflitos...
-        docker stop %APP_CONTAINER%
-
-        echo Restaurando banco de dados...
-        type "%FULL_PATH%" | docker exec -i %DB_CONTAINER% mysql -u %DB_USER% -p%DB_PASS% %DB_NAME%
-
-        echo Reiniciando aplicacao...
-        docker start %APP_CONTAINER%
-
-        echo Restauracao concluida com sucesso!
-    ) else (
-        echo Operacao cancelada.
-    )
-) else (
+if not exist "%FULL_PATH%" (
     echo Arquivo nao encontrado!
+    pause
+    goto main_menu
 )
+
+echo Isso ira sobrescrever o banco atual com o arquivo %RESTORE_FILE%.
+set /p "CONFIRM=Tem certeza absoluta? (s/n): "
+
+if /i not "%CONFIRM%"=="s" goto restore_cancelled
+
+echo Parando aplicacao Scada para evitar conflitos...
+docker stop %APP_CONTAINER%
+
+echo Restaurando banco de dados...
+type "%FULL_PATH%" | docker exec -i %DB_CONTAINER% mysql -u %DB_USER% -p%DB_PASS% %DB_NAME%
+
+echo Reiniciando aplicacao...
+docker start %APP_CONTAINER%
+
+echo Restauracao concluida com sucesso!
+goto restore_end
+
+:restore_cancelled
+echo Operacao cancelada.
+
+:restore_end
 pause
 goto main_menu
 
