@@ -204,9 +204,9 @@ goto main_menu
 :do_wipe
 echo PERIGO: ZONA DE DESTRUICAO
 echo Esta opcao ira:
-   1. Parar e remover todos os containers.
-   2. APAGAR TODOS OS VOLUMES E DADOS DO BANCO DE DADOS!
-   3. Deixar o sistema como se fosse recem instalado.
+echo    1. Parar e remover todos os containers.
+echo    2. APAGAR TODOS OS VOLUMES E DADOS DO BANCO DE DADOS!
+echo    3. Deixar o sistema como se fosse recem instalado.
 echo.
 echo Dica: Faca um backup (Opcao 1) antes de fazer isso.
 echo.
