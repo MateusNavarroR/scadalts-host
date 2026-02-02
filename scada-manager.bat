@@ -212,14 +212,18 @@ echo Dica: Faca um backup (Opcao 1) antes de fazer isso.
 echo.
 set /p "CONFIRM=Para confirmar, digite a palavra 'DELETAR' em maiusculo: "
 
-if "%CONFIRM%"=="DELETAR" (
-    echo Executando limpeza total (down -v)...
-    docker compose down -v
-    echo Sistema limpo. Todos os dados foram apagados.
-    echo Para iniciar novamente zerado, use a Opcao 3 ou 5.
-) else (
-    echo Operacao cancelada. Ufa!
-)
+if not "%CONFIRM%"=="DELETAR" goto wipe_cancelled
+
+echo Executando limpeza total (down -v)...
+docker compose down -v
+echo Sistema limpo. Todos os dados foram apagados.
+echo Para iniciar novamente zerado, use a Opcao 3 ou 5.
+goto wipe_end
+
+:wipe_cancelled
+echo Operacao cancelada. Ufa!
+
+:wipe_end
 pause
 goto main_menu
 
