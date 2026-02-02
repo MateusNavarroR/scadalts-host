@@ -33,7 +33,10 @@ echo.
 echo --- INFORMACOES E ACESSO ---
 echo 7. Pegar Link Publico (Cloudflare)
 echo 8. Ver Status dos Containers
-echo 9. Sair
+echo.
+echo --- SISTEMA ---
+echo 9. Ajuda
+echo 10. Sair
 echo.
 set /p "OPTION=Escolha uma opcao: "
 
@@ -51,7 +54,8 @@ if "%OPTION%"=="8" (
     pause
     goto main_menu
 )
-if "%OPTION%"=="9" (
+if "%OPTION%"=="9" goto show_help
+if "%OPTION%"=="10" (
     echo Saindo...
     goto :eof
 )
@@ -72,13 +76,40 @@ echo =================================================
 echo.
 goto :eof
 
+:: FUNCAO DE AJUDA
+:show_help
+call :show_header
+echo --- AJUDA: O QUE CADA OPCAO FAZ ---
+echo.
+echo 1. Fazer Backup: Cria uma copia de seguranca completa do banco de dados na pasta 'backups'.
+echo.
+echo 2. Restaurar Backup: Substitui os dados atuais por um backup. ATENCAO: os dados atuais serao perdidos!
+echo.
+echo 3. Atualizar Imagens: Reconstroi o sistema para incluir novas imagens da pasta 'scada_imagens'.
+echo.
+echo 4. Pausar Containers: Para todos os servicos (Scada, banco, etc.) sem apagar dados. Ideal para economizar recursos.
+echo.
+echo 5. Iniciar Containers: Inicia os servicos que foram pausados anteriormente.
+echo.
+echo 6. RESET TOTAL: ACAO DESTRUTIVA! Apaga todos os containers e todos os dados, restaurando o sistema para o estado inicial.
+echo.
+echo 7. Pegar Link Publico: Mostra a URL do Cloudflare para acessar o Scada-LTS pela internet.
+echo.
+echo 8. Ver Status: Exibe o status atual de todos os containers (rodando, parado, etc.).
+echo.
+echo 9. Ajuda: Mostra esta tela de ajuda.
+echo.
+echo 10. Sair: Fecha este script de gerenciamento.
+echo.
+pause
+goto main_menu
+
 :: 1. FUNCAO: FAZER BACKUP
 :do_backup
 echo Iniciando backup do banco de dados...
 
-:: Gera um timestamp no formato YYYY-MM-DD_HH-MM-SS
-for /f "tokens=2 delims==" %%I in ('wmic os get localdatetime /format:list') do set datetime=%%I
-set "TIMESTAMP=%datetime:~0,4%-%datetime:~4,2%-%datetime:~6,2%_%datetime:~8,2%-%datetime:~10,2%-%datetime:~12,2%"
+:: Gera um timestamp no formato YYYY-MM-DD_HH-MM-SS usando PowerShell para maior compatibilidade
+for /f "delims=" %%I in ('powershell -NoProfile -Command "Get-Date -Format 'yyyy-MM-dd_HH-mm-ss'"') do set "TIMESTAMP=%%I"
 set "FILENAME=%BACKUP_DIR%\backup_scada_%TIMESTAMP%.sql"
 
 docker exec %DB_CONTAINER% mysqldump -u %DB_USER% -p%DB_PASS% %DB_NAME% > "%FILENAME%"

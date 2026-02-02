@@ -159,6 +159,33 @@ get_tunnel_url() {
     read -p "Pressione Enter para voltar..."
 }
 
+# FUNÇÃO DE AJUDA
+show_help() {
+    show_header
+    echo -e "${YELLOW}--- AJUDA: O QUE CADA OPÇÃO FAZ ---${NC}"
+    echo ""
+    echo -e "${GREEN}1. Fazer Backup:${NC} Cria uma cópia de segurança completa do banco de dados na pasta 'backups'."
+    echo ""
+    echo -e "${GREEN}2. Restaurar Backup:${NC} Substitui os dados atuais por um backup. ${RED}ATENÇÃO: os dados atuais serão perdidos!${NC}"
+    echo ""
+    echo -e "${GREEN}3. Atualizar Imagens:${NC} Reconstrói o sistema para incluir novas imagens da pasta 'scada_imagens'."
+    echo ""
+    echo -e "${GREEN}4. Pausar Containers:${NC} Para todos os serviços (Scada, banco, etc.) sem apagar dados. Ideal para economizar recursos."
+    echo ""
+    echo -e "${GREEN}5. Iniciar Containers:${NC} Inicia os serviços que foram pausados anteriormente."
+    echo ""
+    echo -e "${GREEN}6. RESET TOTAL:${NC} ${RED}AÇÃO DESTRUTIVA!${NC} Apaga todos os containers e todos os dados, restaurando o sistema para o estado inicial."
+    echo ""
+    echo -e "${GREEN}7. Pegar Link Público:${NC} Mostra a URL do Cloudflare para acessar o Scada-LTS pela internet."
+    echo ""
+    echo -e "${GREEN}8. Ver Status:${NC} Exibe o status atual de todos os containers (rodando, parado, etc.)."
+    echo ""
+    echo -e "${GREEN}9. Sair:${NC} Fecha este script de gerenciamento."
+    echo ""
+    read -p "Pressione Enter para voltar ao menu..."
+}
+
+
 # MENU PRINCIPAL
 while true; do
     show_header
@@ -175,7 +202,10 @@ while true; do
     echo -e "${CYAN}--- INFORMAÇÕES E ACESSO ---${NC}"
     echo "7. 🌐 Pegar Link Público (Cloudflare)"
     echo "8. 🔍 Ver Status dos Containers"
-    echo "9. 🚪 Sair"
+    echo ""
+    echo -e "${CYAN}--- SISTEMA ---${NC}"
+    echo "9. 📖 Ajuda"
+    echo "10. 🚪 Sair"
     echo ""
     read -p "Escolha uma opção: " OPTION
 
@@ -193,7 +223,8 @@ while true; do
            echo ""
            read -p "Pressione Enter..."
            ;;
-        9) echo "Saindo..."; exit 0 ;;
+        9) show_help ;;
+        10) echo "Saindo..."; exit 0 ;;
         *) echo "Opção inválida." ;;
     esac
 done
